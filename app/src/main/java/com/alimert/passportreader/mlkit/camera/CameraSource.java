@@ -120,14 +120,18 @@ public class CameraSource {
 
     /** Stops the camera and releases the resources of the camera and underlying detector. */
     public void release() {
-        synchronized (processorLock) {
-            stop();
-            processingRunnable.release();
-            cleanScreen();
+        if (processingThread != null && processingThread.getState() == Thread.State.TERMINATED) {
+            synchronized (processorLock) {
+                stop();
+                processingRunnable.release();
+                cleanScreen();
 
-            if (frameProcessor != null) {
-                frameProcessor.stop();
+                if (frameProcessor != null) {
+                    frameProcessor.stop();
+                }
             }
+        }else {
+            Log.d(TAG, "release: processingThread is not terminated yet");
         }
     }
 
